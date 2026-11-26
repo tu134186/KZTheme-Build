@@ -105,7 +105,6 @@ static void KZApply(void) {
     }
 }
 
-static int kzToken = 0;
 
 static void KZNotifyCallback(CFNotificationCenterRef c, void *observer, CFStringRef name,
                              const void *object, CFDictionaryRef info) {
