@@ -5,7 +5,7 @@
 #define KZ_DOMAIN @"com.minis.kztheme"
 #define KZ_NOTIFY "com.minis.kztheme.changed"
 #define KZ_THEME_DIR @"/Library/KZTheme"
-#define KZ_REPLAY_APP @"/Applications/ReplayKitAngel.app"
+#define KZ_LOG @"/var/mobile/Library/KZTheme.log"
 
 static NSString *KZStr(NSString *key, NSString *dflt) {
     CFPropertyListRef v = CFPreferencesCopyAppValue((__bridge CFStringRef)key, (__bridge CFStringRef)KZ_DOMAIN);
@@ -19,29 +19,74 @@ static double KZNum(NSString *key, double dflt) {
     return dflt;
 }
 
-// 扫描 ReplayKitAngel.app 里所有录屏用的 .ca 目录，自动适配设备代号（-D73 / -D74 ...）
-static NSArray<NSString *> *KZRecordingCADirs(void) {
-    NSMutableArray *out = [NSMutableArray array];
+static void KZLog(NSString *fmt, ...) {
+    va_list ap; va_start(ap, fmt);
+    NSString *body = [[NSString alloc] initWithFormat:fmt arguments:ap];
+    va_end(ap);
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    df.dateFormat = @"MM-dd HH:mm:ss";
+    NSString *line = [NSString stringWithFormat:@"[%@] %@\n", [df stringFromDate:[NSDate date]], body];
+
     NSFileManager *fm = [NSFileManager defaultManager];
-    NSArray *items = [fm contentsOfDirectoryAtPath:KZ_REPLAY_APP error:nil];
-    for (NSString *name in items) {
-        if (![name hasSuffix:@".ca"]) continue;
-        if (![name hasPrefix:@"sc_compact_"]) continue;
-        [out addObject:[KZ_REPLAY_APP stringByAppendingPathComponent:name]];
-    }
-    return out;
-}
-
-static BOOL KZWriteString(NSString *text, NSString *path) {
-    return [[text dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:YES];
-}
-
-static void KZLog(NSString *msg) {
-    NSString *line = [NSString stringWithFormat:@"[KZTheme] %@\n", msg];
-    NSString *p = @"/var/mobile/Library/KZTheme.log";
-    NSFileHandle *fh = [NSFileHandle fileHandleForWritingAtPath:p];
-    if (!fh) { [line writeToFile:p atomically:YES encoding:NSUTF8StringEncoding error:nil]; }
+    NSDictionary *attr = [fm attributesOfItemAtPath:KZ_LOG error:nil];
+    if ([attr fileSize] > 96 * 1024) [line writeToFile:KZ_LOG atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    NSFileHandle *fh = [NSFileHandle fileHandleForWritingAtPath:KZ_LOG];
+    if (!fh) { [line writeToFile:KZ_LOG atomically:YES encoding:NSUTF8StringEncoding error:nil]; }
     else { @try { [fh seekToEndOfFile]; [fh writeData:[line dataUsingEncoding:NSUTF8StringEncoding]]; [fh closeFile]; } @catch (...) {} }
+}
+
+// 录屏指示器所在的 app 可能出现在这几个位置（有无根 / bindfs 挂载 / 直连）
+static NSArray<NSString *> *KZAppRoots(void) {
+    return @[ @"/Applications/ReplayKitAngel.app",
+              @"/var/jb/mnt/Applications/ReplayKitAngel.app",
+              @"/mnt/Applications/ReplayKitAngel.app",
+              @"/var/jb/Applications/ReplayKitAngel.app",
+              @"/rootfs/Applications/ReplayKitAngel.app" ];
+}
+
+// 返回 @{@"root": 实际用的 app 路径, @"dirs": .ca 目录数组}
+static NSDictionary *KZFindCADirs(void) {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    for (NSString *root in KZAppRoots()) {
+        BOOL isDir = NO;
+        if (![fm fileExistsAtPath:root isDirectory:&isDir] || !isDir) continue;
+        NSArray *items = [fm contentsOfDirectoryAtPath:root error:nil];
+        NSMutableArray *out = [NSMutableArray array];
+        for (NSString *name in items) {
+            if (![name hasSuffix:@".ca"]) continue;
+            if (![name hasPrefix:@"sc_compact_"]) continue;
+            [out addObject:[root stringByAppendingPathComponent:name]];
+        }
+        if (out.count > 0) return @{ @"root": root, @"dirs": out };
+    }
+    return @{ @"root": @"(none)", @"dirs": @[] };
+}
+
+static BOOL KZWriteData(NSData *data, NSString *path) {
+    NSError *err = nil;
+    BOOL ok = [data writeToFile:path options:NSDataWritingAtomic error:&err];
+    if (!ok) KZLog(@"write FAILED %@ : %@", path, err.localizedDescription ?: @"?");
+    return ok;
+}
+
+static NSData *KZEyePNG(NSString *eyeName) {
+    if ([eyeName isEqualToString:@"custom"]) {
+        CFPropertyListRef v = CFPreferencesCopyAppValue(CFSTR("eyeImage"), CFSTR(KZ_DOMAIN));
+        if (v) {
+            NSString *b64 = [NSString stringWithFormat:@"%@", (__bridge id)v];
+            CFRelease(v);
+            NSData *d = [[NSData alloc] initWithBase64EncodedString:b64
+                                                            options:NSDataBase64DecodingIgnoreUnknownCharacters];
+            if (d.length > 200) return d;
+            KZLog(@"custom image decode failed (len=%lu)", (unsigned long)b64.length);
+        } else {
+            KZLog(@"custom image missing in prefs");
+        }
+    }
+    NSString *p = [KZ_THEME_DIR stringByAppendingPathComponent:[NSString stringWithFormat:@"eye/%@.png", eyeName]];
+    NSData *d = [NSData dataWithContentsOfFile:p];
+    if (d) return d;
+    return [NSData dataWithContentsOfFile:[KZ_THEME_DIR stringByAppendingPathComponent:@"eye/sharingan.png"]];
 }
 
 static void KZApply(void) {
@@ -49,60 +94,64 @@ static void KZApply(void) {
     NSString *cdStyle = KZStr(@"countdown", @"B");
     double scale = KZNum(@"scale", 0.6);
     double dur = KZNum(@"duration", 1.5);
-    if (scale < 0.2) scale = 0.2;
+    if (scale < 0.05) scale = 0.6;
     if (scale > 1.4) scale = 1.4;
-    if (dur < 0.2) dur = 0.2;
+    if (dur < 0.1) dur = 1.5;
 
-    NSString *themeDir = KZ_THEME_DIR;
-    NSString *eyeSrc = [themeDir stringByAppendingPathComponent:[NSString stringWithFormat:@"eye/%@.png", eyeName]];
-    if (![[NSFileManager defaultManager] fileExistsAtPath:eyeSrc])
-        eyeSrc = [themeDir stringByAppendingPathComponent:@"eye/sharingan.png"];
+    NSDictionary *found = KZFindCADirs();
+    NSArray *dirs = found[@"dirs"];
+    if (dirs.count == 0) {
+        KZLog(@"apply: no .ca dirs (theme=%@ eye=%@) — 挂载可能没加", KZ_THEME_DIR, eyeName);
+        return;
+    }
 
-    NSString *cdDir = [themeDir stringByAppendingPathComponent:[NSString stringWithFormat:@"cd/%@", cdStyle]];
-
-    NSArray *dirs = KZRecordingCADirs();
-    if (dirs.count == 0) { KZLog(@"no .ca dirs found (mount missing?)"); return; }
+    NSData *eyePNG = KZEyePNG(eyeName);
+    NSData *dotPNG = [NSData dataWithContentsOfFile:[KZ_THEME_DIR stringByAppendingPathComponent:@"eye/dot.png"]];
+    NSMutableArray *cdPNG = [NSMutableArray array];
+    NSString *cdDir = [KZ_THEME_DIR stringByAppendingPathComponent:[NSString stringWithFormat:@"cd/%@", cdStyle]];
+    for (int i = 1; i <= 3; i++) {
+        NSData *d = [NSData dataWithContentsOfFile:
+                     [cdDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%d.png", i]]];
+        [cdPNG addObject:d ?: [NSData data]];
+    }
+    if (!eyePNG) KZLog(@"apply: eye image missing (%@)", eyeName);
 
     NSString *scaleStr = [NSString stringWithFormat:@"%.5f", scale];
     NSString *durStr = [NSString stringWithFormat:@"%.3f", dur];
 
     int ok = 0;
     for (NSString *dir in dirs) {
-        // 1) 生成 main.caml
         NSString *tplPath = [dir.lastPathComponent containsString:@"minimal"] ? @"min.caml" : @"lead.caml";
-        NSString *tpl = [NSString stringWithContentsOfFile:[themeDir stringByAppendingPathComponent:tplPath]
+        NSString *tpl = [NSString stringWithContentsOfFile:[KZ_THEME_DIR stringByAppendingPathComponent:tplPath]
                                                   encoding:NSUTF8StringEncoding error:nil];
-        if (!tpl) continue;
+        if (!tpl) { KZLog(@"apply: template %@ missing", tplPath); continue; }
         NSString *caml = [tpl stringByReplacingOccurrencesOfString:@"__SCALE__" withString:scaleStr];
         caml = [caml stringByReplacingOccurrencesOfString:@"__DUR__" withString:durStr];
-        NSString *dst = [dir stringByAppendingPathComponent:@"main.caml"];
-        if (!KZWriteString(caml, dst)) { KZLog([NSString stringWithFormat:@"write failed: %@", dst]); continue; }
 
-        // 2) 素材
-        NSFileManager *fm = [NSFileManager defaultManager];
-        [fm removeItemAtPath:[dir stringByAppendingPathComponent:@"shar.png"] error:nil];
-        [fm copyItemAtPath:eyeSrc toPath:[dir stringByAppendingPathComponent:@"shar.png"] error:nil];
-        [fm copyItemAtPath:[themeDir stringByAppendingPathComponent:@"eye/dot.png"]
-                    toPath:[dir stringByAppendingPathComponent:@"dot.png"] error:nil];
+        BOOL good = KZWriteData([caml dataUsingEncoding:NSUTF8StringEncoding],
+                                [dir stringByAppendingPathComponent:@"main.caml"]);
+        if (eyePNG) good = KZWriteData(eyePNG, [dir stringByAppendingPathComponent:@"shar.png"]) && good;
+        if (dotPNG) KZWriteData(dotPNG, [dir stringByAppendingPathComponent:@"dot.png"]);
         for (int i = 1; i <= 3; i++) {
-            NSString *src = [cdDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%d.png", i]];
-            [fm removeItemAtPath:[dir stringByAppendingPathComponent:[NSString stringWithFormat:@"%d.png", i]] error:nil];
-            [fm copyItemAtPath:src toPath:[dir stringByAppendingPathComponent:[NSString stringWithFormat:@"%d.png", i]] error:nil];
+            NSData *d = cdPNG[i - 1];
+            if (d.length > 0)
+                KZWriteData(d, [dir stringByAppendingPathComponent:[NSString stringWithFormat:@"%d.png", i]]);
         }
-        ok++;
+        if (good) ok++;
     }
-    KZLog([NSString stringWithFormat:@"applied eye=%@ cd=%@ scale=%@ dur=%@ -> %d dirs", eyeName, cdStyle, scaleStr, durStr, ok]);
 
-    // 3) 清掉旧版遗留的多余 png（86 张那批）
+    // 清掉旧版遗留的多余 png
+    NSFileManager *fm = [NSFileManager defaultManager];
     for (NSString *dir in dirs) {
-        NSArray *pngs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:dir error:nil];
-        for (NSString *p in pngs) {
+        for (NSString *p in [fm contentsOfDirectoryAtPath:dir error:nil]) {
             if (![p hasSuffix:@".png"]) continue;
             if ([p isEqualToString:@"shar.png"] || [p isEqualToString:@"dot.png"] ||
                 [p isEqualToString:@"1.png"] || [p isEqualToString:@"2.png"] || [p isEqualToString:@"3.png"]) continue;
-            [[NSFileManager defaultManager] removeItemAtPath:[dir stringByAppendingPathComponent:p] error:nil];
+            [fm removeItemAtPath:[dir stringByAppendingPathComponent:p] error:nil];
         }
     }
+    KZLog(@"apply: root=%@ dirs=%lu ok=%d eye=%@ cd=%@ scale=%@ dur=%@",
+          found[@"root"], (unsigned long)dirs.count, ok, eyeName, cdStyle, scaleStr, durStr);
 }
 
 
@@ -112,7 +161,7 @@ static void KZNotifyCallback(CFNotificationCenterRef c, void *observer, CFString
 }
 
 %ctor {
-    KZLog(@"tweak loaded");
+    KZLog(@"tweak loaded (v1.1.0)");
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         KZApply();
     });
