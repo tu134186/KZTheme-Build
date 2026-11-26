@@ -1,13 +1,12 @@
 #!/bin/sh
-# 安装后：把挂载点里的 .ca 目录交给 mobile，让插件（SpringBoard 身份）能写入
 set -e
-APP=/Applications/ReplayKitAngel.app
-if [ -d "$APP" ]; then
+for APP in /Applications/ReplayKitAngel.app /var/jb/mnt/Applications/ReplayKitAngel.app /mnt/Applications/ReplayKitAngel.app; do
+    [ -d "$APP" ] || continue
     for d in "$APP"/sc_compact_*.ca; do
         [ -d "$d" ] && chown -R mobile:wheel "$d" 2>/dev/null || true
         [ -d "$d" ] && chmod -R 775 "$d" 2>/dev/null || true
     done
-fi
-# 主题资源目录也交给 mobile 便于读取
+done
 [ -d "/Library/KZTheme" ] && chown -R mobile:wheel "/Library/KZTheme" 2>/dev/null || true
+[ -d "/var/jb/Library/KZTheme" ] && chown -R mobile:wheel "/var/jb/Library/KZTheme" 2>/dev/null || true
 exit 0
