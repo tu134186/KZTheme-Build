@@ -1,6 +1,6 @@
 Package: com.minis.kztheme
 Name: 写轮眼主题
-Version: 1.0.1
+Version: 1.0.2
 Architecture: iphoneos-arm64
 Description: 灵动岛录屏写轮眼主题：一键切换素材、倒数样式、大小与转速。需先添加 ReplayKitAngel 挂载。
 Maintainer: Minis

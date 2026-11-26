@@ -8,8 +8,12 @@
 		<string>KZThemePrefs</string>
 		<key>cell</key>
 		<string>PSLinkCell</string>
+		<key>defaults</key>
+		<string>com.minis.kztheme</string>
 		<key>detail</key>
 		<string>KZRootListController</string>
+		<key>icon</key>
+		<string>icon.png</string>
 		<key>label</key>
 		<string>写轮眼主题</string>
 	</dict>

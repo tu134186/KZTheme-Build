@@ -9,6 +9,5 @@ if [ -d "$APP" ]; then
     done
 fi
 # 主题资源目录也交给 mobile 便于读取
-[ -d "/Library/Application Support/KZTheme" ] && chown -R mobile:wheel "/Library/Application Support/KZTheme" 2>/dev/null || true
-chown mobile:wheel /var/mobile/Library 2>/dev/null || true
+[ -d "/Library/KZTheme" ] && chown -R mobile:wheel "/Library/KZTheme" 2>/dev/null || true
 exit 0
