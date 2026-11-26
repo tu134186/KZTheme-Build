@@ -10,23 +10,41 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>写轮眼素材</string>
+			<string>素材图片</string>
 			<key>footerText</key>
-			<string>填 /Library/KZTheme/eye/ 里的文件名（不带 .png）。默认 sharingan = 写轮眼，填 dot 就是普通圆点。</string>
+			<string>导入的图片会裁成正方形、缩到 320×320，存进设置里，不用往挂载目录拷文件。</string>
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSEditTextCell</string>
-			<key>label</key>
-			<string>素材文件名</string>
+			<string>PSStaticTextCell</string>
 			<key>key</key>
-			<string>eye</string>
-			<key>default</key>
-			<string>sharingan</string>
-			<key>placeholder</key>
-			<string>sharingan</string>
-			<key>defaults</key>
-			<string>com.minis.kztheme</string>
+			<string>eyeName</string>
+			<key>label</key>
+			<string>当前素材：sharingan</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>从相册导入图片…</string>
+			<key>action</key>
+			<string>importPhoto</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>从文件导入 PNG…</string>
+			<key>action</key>
+			<string>importFile</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>恢复默认写轮眼</string>
+			<key>action</key>
+			<string>resetEye</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -66,49 +84,65 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>大小与转速</string>
+			<string>大小</string>
 			<key>footerText</key>
-			<string>大小：0.6 已经是系统槽位上限，再大就会被裁掉。转速：秒数，越大转得越慢（1.5 = 1.5 秒转一圈）。</string>
+			<string>0.60 已经是系统槽位上限，再大就会被裁掉。</string>
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSEditTextCell</string>
+			<string>KZStepperCell</string>
 			<key>label</key>
 			<string>大小 scale</string>
 			<key>key</key>
 			<string>scale</string>
 			<key>default</key>
 			<string>0.6</string>
-			<key>placeholder</key>
-			<string>0.6</string>
-			<key>defaults</key>
-			<string>com.minis.kztheme</string>
+			<key>min</key>
+			<real>0.1</real>
+			<key>max</key>
+			<real>0.6</real>
+			<key>step</key>
+			<real>0.01</real>
+			<key>height</key>
+			<real>70</real>
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSEditTextCell</string>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>转速</string>
+			<key>footerText</key>
+			<string>秒数，越大转得越慢（1.50 = 1.5 秒转一圈）。</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>KZStepperCell</string>
 			<key>label</key>
 			<string>转速 duration</string>
 			<key>key</key>
 			<string>duration</string>
 			<key>default</key>
 			<string>1.5</string>
-			<key>placeholder</key>
-			<string>1.5</string>
-			<key>defaults</key>
-			<string>com.minis.kztheme</string>
+			<key>min</key>
+			<real>0.2</real>
+			<key>max</key>
+			<real>5.0</real>
+			<key>step</key>
+			<real>0.1</real>
+			<key>height</key>
+			<real>70</real>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>点下面「应用」把设置写进挂载目录。写完后开始录屏就能看到；如果还是旧样子，去 Dopamine 注销一次。</string>
+			<string>改完会自动应用。如果画面还是旧的，点一下下面的按钮，或去 Dopamine 注销一次。</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
 			<key>label</key>
-			<string>应用</string>
+			<string>立即应用</string>
 			<key>action</key>
 			<string>applyNow</string>
 		</dict>
