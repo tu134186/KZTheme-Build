@@ -1,0 +1,8 @@
+{
+    entry = {
+        bundle = "KZThemePrefs";
+        cell = PSLinkCell;
+        detail = "KZRootListController";
+        label = "写轮眼主题";
+    };
+}

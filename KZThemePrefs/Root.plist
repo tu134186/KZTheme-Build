@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>写轮眼素材</string>
+			<key>footerText</key>
+			<string>选中后点最下面的「应用」按钮即可生效，不用重启。</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSEditTextCell</string>
+			<key>label</key>
+			<string>素材文件名</string>
+			<key>key</key>
+			<string>eye</string>
+			<key>default</key>
+			<string>sharingan</string>
+			<key>placeholder</key>
+			<string>sharingan</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>倒数 3-2-1 样式</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSListItemsController</string>
+			<key>label</key>
+			<string>样式</string>
+			<key>key</key>
+			<string>countdown</string>
+			<key>default</key>
+			<string>B</string>
+			<key>validValues</key>
+			<array>
+				<string>A</string>
+				<string>B</string>
+				<string>C</string>
+			</array>
+			<key>titles</key>
+			<array>
+				<string>A 标准（六边形白点）</string>
+				<string>B 彩色数字（推荐）</string>
+				<string>C 彩色秒表</string>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>大小与转速</string>
+			<key>footerText</key>
+			<string>大小：0.6 是系统槽位上限，再大就会被裁掉。转速：秒数，越大转得越慢。</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSEditTextCell</string>
+			<key>label</key>
+			<string>大小 scale</string>
+			<key>key</key>
+			<string>scale</string>
+			<key>default</key>
+			<string>0.6</string>
+			<key>placeholder</key>
+			<string>0.6</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSEditTextCell</string>
+			<key>label</key>
+			<string>转速 duration</string>
+			<key>key</key>
+			<string>duration</string>
+			<key>default</key>
+			<string>1.5</string>
+			<key>placeholder</key>
+			<string>1.5</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>点下面按钮把设置写进挂载目录。若没生效，注销一次即可。</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>应用</string>
+			<key>action</key>
+			<string>applyNow</string>
+		</dict>
+	</array>
+	<key>title</key>
+	<string>写轮眼主题</string>
+</dict>
+</plist>
