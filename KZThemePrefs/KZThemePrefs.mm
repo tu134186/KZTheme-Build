@@ -279,8 +279,8 @@ didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
 
 - (void)resetEye {
     KZPrefSet(@"eye", @"sharingan");
-    CFPreferencesSetAppValue(CFSTR("eyeImage"), NULL, CFSTR(KZ_DOMAIN));
-    CFPreferencesAppSynchronize(CFSTR(KZ_DOMAIN));
+    CFPreferencesSetAppValue(CFSTR("eyeImage"), NULL, (__bridge CFStringRef)KZ_DOMAIN);
+    CFPreferencesAppSynchronize((__bridge CFStringRef)KZ_DOMAIN);
     [self notifyRow];
     KZScheduleApply();
     [self reloadSpecifiers];
