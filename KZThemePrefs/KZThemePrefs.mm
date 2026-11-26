@@ -9,6 +9,16 @@
 #define KZ_DOMAIN @"com.minis.kztheme"
 #define KZ_NOTIFY "com.minis.kztheme.changed"
 
+// 私有但稳定的接口，显式声明避免编译报未声明
+@interface PSSpecifier (KZPrivate)
+- (id)performGetter;
+- (void)performSetterWithValue:(id)value;
+@end
+
+@interface PSListController (KZPrivate)
+- (void)reloadSpecifier:(PSSpecifier *)specifier animated:(BOOL)animated;
+@end
+
 static NSString *KZPrefStr(NSString *key) {
     CFPropertyListRef v = CFPreferencesCopyAppValue((__bridge CFStringRef)key, (__bridge CFStringRef)KZ_DOMAIN);
     if (!v) return nil;
