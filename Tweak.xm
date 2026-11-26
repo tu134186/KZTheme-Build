@@ -72,7 +72,7 @@ static BOOL KZWriteData(NSData *data, NSString *path) {
 
 static NSData *KZEyePNG(NSString *eyeName) {
     if ([eyeName isEqualToString:@"custom"]) {
-        CFPropertyListRef v = CFPreferencesCopyAppValue(CFSTR("eyeImage"), CFSTR(KZ_DOMAIN));
+        CFPropertyListRef v = CFPreferencesCopyAppValue(CFSTR("eyeImage"), (__bridge CFStringRef)KZ_DOMAIN);
         if (v) {
             NSString *b64 = [NSString stringWithFormat:@"%@", (__bridge id)v];
             CFRelease(v);
