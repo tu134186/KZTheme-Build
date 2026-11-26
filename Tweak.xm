@@ -4,7 +4,7 @@
 
 #define KZ_DOMAIN @"com.minis.kztheme"
 #define KZ_NOTIFY "com.minis.kztheme.changed"
-#define KZ_THEME_DIR @"/Library/Application Support/KZTheme"
+#define KZ_THEME_DIR @"/Library/KZTheme"
 #define KZ_REPLAY_APP @"/Applications/ReplayKitAngel.app"
 
 static NSString *KZStr(NSString *key, NSString *dflt) {

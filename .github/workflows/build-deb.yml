@@ -24,7 +24,7 @@ jobs:
           assert version==Path('VERSION.txt').read_text().strip()
           for p in Path('.').rglob('*.plist'):
               if '.git' not in p.parts: plistlib.loads(p.read_bytes())
-          theme=Path('layout/Library/Application Support/KZTheme')
+          theme=Path('layout/Library/KZTheme')
           for n in ['lead.caml','min.caml','eye/sharingan.png','eye/dot.png']:
               assert (theme/n).is_file(), n
           for s in 'ABC':
