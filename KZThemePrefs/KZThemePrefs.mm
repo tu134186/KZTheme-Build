@@ -14,6 +14,11 @@
 - (id)specifiers {
     if (_specifiers == nil) {
         _specifiers = [self loadSpecifiersFromPlistName:@"Root" target:self];
+        for (PSSpecifier *s in _specifiers) {
+            if ([s propertyForKey:@"action"]) {
+                [s setTarget:self];
+            }
+        }
     }
     return _specifiers;
 }
