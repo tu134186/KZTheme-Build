@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <notify.h>
+#import <stdarg.h>
 
 #define KZ_DOMAIN @"com.minis.kztheme"
 #define KZ_NOTIFY "com.minis.kztheme.changed"
