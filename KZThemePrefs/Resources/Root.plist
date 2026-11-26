@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>title</key>
+	<string>写轮眼主题</string>
 	<key>items</key>
 	<array>
 		<dict>
@@ -10,7 +12,7 @@
 			<key>label</key>
 			<string>写轮眼素材</string>
 			<key>footerText</key>
-			<string>选中后点最下面的「应用」按钮即可生效，不用重启。</string>
+			<string>填 /Library/KZTheme/eye/ 里的文件名（不带 .png）。默认 sharingan = 写轮眼，填 dot 就是普通圆点。</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -23,22 +25,30 @@
 			<string>sharingan</string>
 			<key>placeholder</key>
 			<string>sharingan</string>
+			<key>defaults</key>
+			<string>com.minis.kztheme</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>倒数 3-2-1 样式</string>
+			<key>footerText</key>
+			<string>录屏开始前系统倒数 3 秒时显示的图案。</string>
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSListItemsController</string>
+			<string>PSLinkListCell</string>
 			<key>label</key>
 			<string>样式</string>
 			<key>key</key>
 			<string>countdown</string>
 			<key>default</key>
 			<string>B</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>defaults</key>
+			<string>com.minis.kztheme</string>
 			<key>validValues</key>
 			<array>
 				<string>A</string>
@@ -58,7 +68,7 @@
 			<key>label</key>
 			<string>大小与转速</string>
 			<key>footerText</key>
-			<string>大小：0.6 是系统槽位上限，再大就会被裁掉。转速：秒数，越大转得越慢。</string>
+			<string>大小：0.6 已经是系统槽位上限，再大就会被裁掉。转速：秒数，越大转得越慢（1.5 = 1.5 秒转一圈）。</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -71,6 +81,8 @@
 			<string>0.6</string>
 			<key>placeholder</key>
 			<string>0.6</string>
+			<key>defaults</key>
+			<string>com.minis.kztheme</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -83,12 +95,14 @@
 			<string>1.5</string>
 			<key>placeholder</key>
 			<string>1.5</string>
+			<key>defaults</key>
+			<string>com.minis.kztheme</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>点下面按钮把设置写进挂载目录。若没生效，注销一次即可。</string>
+			<string>点下面「应用」把设置写进挂载目录。写完后开始录屏就能看到；如果还是旧样子，去 Dopamine 注销一次。</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -99,7 +113,5 @@
 			<string>applyNow</string>
 		</dict>
 	</array>
-	<key>title</key>
-	<string>写轮眼主题</string>
 </dict>
 </plist>

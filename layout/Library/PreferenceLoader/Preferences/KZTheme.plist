@@ -14,6 +14,8 @@
 		<string>KZRootListController</string>
 		<key>icon</key>
 		<string>icon.png</string>
+		<key>isController</key>
+		<true/>
 		<key>label</key>
 		<string>写轮眼主题</string>
 	</dict>
