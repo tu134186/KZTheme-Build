@@ -69,7 +69,10 @@ static NSDictionary *KZFindCADirs(void) {
             if (![name hasPrefix:@"sc_compact_"]) continue;
             [out addObject:[root stringByAppendingPathComponent:name]];
         }
-        if (out.count > 0) return @{ @"root": root, @"dirs": out };
+        if (out.count > 0) {
+            KZLog(@"found root %@ dirs=%lu", root, (unsigned long)out.count);
+            return @{ @"root": root, @"dirs": out };
+        }
     }
     return @{ @"root": @"(none)", @"dirs": @[] };
 }
@@ -104,10 +107,13 @@ static NSData *KZEyePNG(NSString *eyeName) {
 static void KZApply(void) {
     NSString *eyeName = KZStr(@"eye", @"sharingan");
     NSString *cdStyle = KZStr(@"countdown", @"B");
-    double scale = KZNum(@"scale", 0.6);
+    double scaleL = KZNum(@"scale", 0.6);
+    double scaleR = KZNum(@"scaleR", 0.95);
     double dur = KZNum(@"duration", 1.5);
-    if (scale < 0.05) scale = 0.6;
-    if (scale > 1.4) scale = 1.4;
+    if (scaleL < 0.05) scaleL = 0.6;
+    if (scaleR < 0.05) scaleR = 0.95;
+    if (scaleL > 1.5) scaleL = 1.5;
+    if (scaleR > 1.5) scaleR = 1.5;
     if (dur < 0.1) dur = 1.5;
 
     NSDictionary *found = KZFindCADirs();
@@ -129,7 +135,6 @@ static void KZApply(void) {
     }
     if (!eyePNG) KZLog(@"apply: eye image missing (%@)", eyeName);
 
-    NSString *scaleStr = [NSString stringWithFormat:@"%.5f", scale];
     NSString *durStr = [NSString stringWithFormat:@"%.3f", dur];
 
     int ok = 0;
@@ -138,7 +143,13 @@ static void KZApply(void) {
         NSString *tpl = [NSString stringWithContentsOfFile:[KZ_THEME_DIR stringByAppendingPathComponent:tplPath]
                                                   encoding:NSUTF8StringEncoding error:nil];
         if (!tpl) { KZLog(@"apply: template %@ missing", tplPath); continue; }
+        BOOL minimal = [dir.lastPathComponent containsString:@"minimal"];
+        double s = minimal ? scaleR : scaleL;
+        double cdScale = 0.578 * s / 0.6;
+        NSString *scaleStr = [NSString stringWithFormat:@"%.5f", s];
+        NSString *cdStr = [NSString stringWithFormat:@"%.5f", cdScale];
         NSString *caml = [tpl stringByReplacingOccurrencesOfString:@"__SCALE__" withString:scaleStr];
+        caml = [caml stringByReplacingOccurrencesOfString:@"__CDSCALE__" withString:cdStr];
         caml = [caml stringByReplacingOccurrencesOfString:@"__DUR__" withString:durStr];
 
         BOOL good = KZWriteData([caml dataUsingEncoding:NSUTF8StringEncoding],
@@ -163,10 +174,11 @@ static void KZApply(void) {
             [fm removeItemAtPath:[dir stringByAppendingPathComponent:p] error:nil];
         }
     }
-    KZLog(@"apply: root=%@ dirs=%lu ok=%d eye=%@ cd=%@ scale=%@ dur=%@",
-          found[@"root"], (unsigned long)dirs.count, ok, eyeName, cdStyle, scaleStr, durStr);
-    KZBeat([NSString stringWithFormat:@"%@ 目录%lu 成功%d 素材%@ %@s",
-            [found[@"root"] lastPathComponent], (unsigned long)dirs.count, ok, eyeName, scaleStr]);
+    NSString *shortRoot = [found[@"root"] stringByReplacingOccurrencesOfString:@"/Applications/ReplayKitAngel.app" withString:@"/"];
+    KZLog(@"apply: root=%@ dirs=%lu ok=%d eye=%@ cd=%@ L=%.2f R=%.2f dur=%@",
+          found[@"root"], (unsigned long)dirs.count, ok, eyeName, cdStyle, scaleL, scaleR, durStr);
+    KZBeat([NSString stringWithFormat:@"%@ 目录%lu 成功%d 左%.2f 右%.2f",
+            shortRoot, (unsigned long)dirs.count, ok, scaleL, scaleR]);
 }
 
 
