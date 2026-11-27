@@ -29,14 +29,13 @@ static void KZPrefClear(NSString *key) {
 
 // 拖动滑块会连续写值，去抖 0.8 秒只应用最后那一次
 static void KZApplySoon(void) {
-    static dispatch_block_t pending = nil;
-    if (pending) { dispatch_block_cancel(pending); pending = nil; }
-    dispatch_block_t blk = dispatch_block_create(0, ^{
-        pending = nil;
-        notify_post(KZ_NOTIFY);
+    static int gen = 0;
+    gen++;
+    int mine = gen;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.8 * NSEC_PER_SEC)),
+                   dispatch_get_main_queue(), ^{
+        if (mine == gen) notify_post(KZ_NOTIFY);
     });
-    pending = blk;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.8 * NSEC_PER_SEC)), dispatch_get_main_queue(), blk);
 }
 
 @interface PSListController (KZPrivate)
