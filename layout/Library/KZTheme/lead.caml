@@ -42,9 +42,9 @@
 		      </CAShapeLayer>
 		    </sublayers>
 		  </CALayer>
-<CALayer id="#301" bounds="0 0 150 150" contentsFormat="RGBA8" hidden="0" name="d3" opacity="0" position="77.2 74.8" transform="scale(0.578, 0.578, 1)"><contents type="CGImage" src="3.png"/></CALayer>
-<CALayer id="#302" bounds="0 0 150 150" contentsFormat="RGBA8" hidden="0" name="d2" opacity="0" position="77.2 74.8" transform="scale(0.578, 0.578, 1)"><contents type="CGImage" src="2.png"/></CALayer>
-<CALayer id="#303" bounds="0 0 150 150" contentsFormat="RGBA8" hidden="0" name="d1" opacity="0" position="77.2 74.8" transform="scale(0.578, 0.578, 1)"><contents type="CGImage" src="1.png"/></CALayer>
+<CALayer id="#301" bounds="0 0 150 150" contentsFormat="RGBA8" hidden="0" name="d3" opacity="0" position="77.2 74.8" transform="scale(__CDSCALE__, __CDSCALE__, 1)"><contents type="CGImage" src="3.png"/></CALayer>
+<CALayer id="#302" bounds="0 0 150 150" contentsFormat="RGBA8" hidden="0" name="d2" opacity="0" position="77.2 74.8" transform="scale(__CDSCALE__, __CDSCALE__, 1)"><contents type="CGImage" src="2.png"/></CALayer>
+<CALayer id="#303" bounds="0 0 150 150" contentsFormat="RGBA8" hidden="0" name="d1" opacity="0" position="77.2 74.8" transform="scale(__CDSCALE__, __CDSCALE__, 1)"><contents type="CGImage" src="1.png"/></CALayer>
 		  <CALayer id="#3" allowsEdgeAntialiasing="1" allowsGroupOpacity="1" backgroundColor="1.082 0.75 0.75" bounds="0 0 150 150" contentsFormat="RGBA8" cornerRadius="75" name="rec" opacity="0" position="77.2 74.8" transform="scale(0.01, 0.01, 1)">
 <contents type="CGImage"
 					src="shar.png"/>
