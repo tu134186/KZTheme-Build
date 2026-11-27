@@ -19,6 +19,11 @@
 - (void)reloadSpecifier:(PSSpecifier *)specifier animated:(BOOL)animated;
 @end
 
+@interface PSSpecifier (KZCellClass)
+- (void)setCellClass:(Class)cls;
+- (Class)cellClass;
+@end
+
 static NSString *KZPrefStr(NSString *key) {
     CFPropertyListRef v = CFPreferencesCopyAppValue((__bridge CFStringRef)key, (__bridge CFStringRef)KZ_DOMAIN);
     if (!v) return nil;
@@ -172,8 +177,17 @@ static void KZScheduleApply(void) {
 - (id)specifiers {
     if (_specifiers == nil) {
         _specifiers = [self loadSpecifiersFromPlistName:@"Root" target:self];
+        Class stepper = NSClassFromString(@"KZStepperCell");
         for (PSSpecifier *s in _specifiers) {
             if ([s propertyForKey:@"action"]) [s setTarget:self];
+            NSString *key = [s propertyForKey:@"key"];
+            if ([key isEqualToString:@"scale"] || [key isEqualToString:@"duration"]) {
+                if (stepper) {
+                    [s setProperty:stepper forKey:@"cellClass"];
+                    if ([s respondsToSelector:@selector(setCellClass:)]) [s setCellClass:stepper];
+                }
+                [s setProperty:@76 forKey:@"height"];
+            }
         }
     }
     return _specifiers;
@@ -196,15 +210,59 @@ static void KZScheduleApply(void) {
 
 #pragma mark 导入
 
+- (NSString *)countdownTitle {
+    NSString *cd = KZPrefStr(@"countdown") ?: @"B";
+    NSDictionary *names = @{ @"A": @"A 六边形白点", @"B": @"B 彩色数字", @"C": @"C 彩色秒表" };
+    return [NSString stringWithFormat:@"样式：%@（点一下换下一套）", names[cd] ?: cd];
+}
+
 - (void)notifyRow {
     NSString *eye = KZPrefStr(@"eye") ?: @"sharingan";
     NSString *shown = [eye isEqualToString:@"custom"] ? @"自定义图片" : eye;
     for (PSSpecifier *s in self.specifiers) {
-        if ([[s propertyForKey:@"key"] isEqualToString:@"eyeName"]) {
+        NSString *key = [s propertyForKey:@"key"];
+        if ([key isEqualToString:@"eyeName"]) {
             [s setProperty:[NSString stringWithFormat:@"当前素材：%@", shown] forKey:@"label"];
+            [self reloadSpecifier:s animated:NO];
+        } else if ([key isEqualToString:@"countdown"]) {
+            [s setProperty:[self countdownTitle] forKey:@"label"];
             [self reloadSpecifier:s animated:NO];
         }
     }
+    [self refreshStatus];
+}
+
+- (void)refreshStatus {
+    NSString *seen = KZPrefStr(@"lastSeen");
+    NSString *status;
+    if (!seen) {
+        status = @"插件：未运行（tweak 没被注入，或还没到 3 秒）";
+    } else {
+        double d = [[NSDate date] timeIntervalSince1970] - [seen doubleValue];
+        NSString *ago = d < 90 ? @"刚刚" : [NSString stringWithFormat:@"%.0f 分钟前", d / 60.0];
+        status = [NSString stringWithFormat:@"插件：运行中（%@）", ago];
+    }
+    NSString *res = KZPrefStr(@"lastResult") ?: @"无记录";
+    for (PSSpecifier *s in self.specifiers) {
+        NSString *key = [s propertyForKey:@"key"];
+        if ([key isEqualToString:@"kzStatus"]) {
+            [s setProperty:status forKey:@"label"];
+            [self reloadSpecifier:s animated:NO];
+        } else if ([key isEqualToString:@"kzResult"]) {
+            [s setProperty:[NSString stringWithFormat:@"上次应用：%@", res] forKey:@"label"];
+            [self reloadSpecifier:s animated:NO];
+        }
+    }
+}
+
+- (void)cycleCountdown {
+    NSArray *vals = @[ @"A", @"B", @"C" ];
+    NSString *cur = KZPrefStr(@"countdown") ?: @"B";
+    NSUInteger i = [vals indexOfObject:cur];
+    NSUInteger next = (i == NSNotFound) ? 1 : (i + 1) % vals.count;
+    KZPrefSet(@"countdown", vals[next]);
+    [self notifyRow];
+    notify_post(KZ_NOTIFY);
 }
 
 - (void)storeImage:(UIImage *)img {
@@ -286,9 +344,41 @@ didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
     [self reloadSpecifiers];
 }
 
+- (void)promptNumberForKey:(NSString *)key title:(NSString *)title min:(double)mn max:(double)mx {
+    UIAlertController *a = [UIAlertController alertControllerWithTitle:title
+                                                              message:nil
+                                                       preferredStyle:UIAlertControllerStyleAlert];
+    [a addTextFieldWithConfigurationHandler:^(UITextField *tf) {
+        tf.keyboardType = UIKeyboardTypeDecimalPad;
+        tf.text = KZPrefStr(key);
+    }];
+    [a addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+    __weak typeof(self) weakSelf = self;
+    [a addAction:[UIAlertAction actionWithTitle:@"保存" style:UIAlertActionStyleDefault handler:^(UIAlertAction *act) {
+        double v = [a.textFields.firstObject.text doubleValue];
+        if (v < mn) v = mn;
+        if (v > mx) v = mx;
+        KZPrefSet(key, [NSString stringWithFormat:@"%.2f", v]);
+        notify_post(KZ_NOTIFY);
+        [weakSelf reloadSpecifiers];
+    }]];
+    [self presentViewController:a animated:YES completion:nil];
+}
+
+- (void)editScale {
+    [self promptNumberForKey:@"scale" title:@"大小（0.10 - 0.60）" min:0.1 max:0.6];
+}
+
+- (void)editDuration {
+    [self promptNumberForKey:@"duration" title:@"转速秒数（0.2 - 5.0）" min:0.2 max:5.0];
+}
+
 - (void)applyNow {
     KZPrefSet(@"appliedAt", @([[NSDate date] timeIntervalSince1970]));
     notify_post(KZ_NOTIFY);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self refreshStatus];
+    });
     UIAlertController *a = [UIAlertController alertControllerWithTitle:@"已应用"
                                                               message:@"设置已经写进挂载目录。现在开始录屏就能看到；如果没变化，去 Dopamine 注销一次。"
                                                        preferredStyle:UIAlertControllerStyleAlert];
