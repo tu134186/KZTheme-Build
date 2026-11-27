@@ -6,7 +6,7 @@
 #define KZ_DOMAIN @"com.minis.kztheme"
 #define KZ_NOTIFY "com.minis.kztheme.changed"
 #define KZ_THEME_DIR @"/Library/KZTheme"
-#define KZ_LOG @"/var/mobile/Library/KZTheme.log"
+#define KZ_LOG @"/var/mobile/KZTheme.log"
 
 static NSString *KZStr(NSString *key, NSString *dflt) {
     CFPropertyListRef v = CFPreferencesCopyAppValue((__bridge CFStringRef)key, (__bridge CFStringRef)KZ_DOMAIN);
@@ -18,6 +18,18 @@ static double KZNum(NSString *key, double dflt) {
     CFPropertyListRef v = CFPreferencesCopyAppValue((__bridge CFStringRef)key, (__bridge CFStringRef)KZ_DOMAIN);
     if (v) { double d = [(__bridge NSNumber *)v doubleValue]; CFRelease(v); return d; }
     return dflt;
+}
+
+static void KZSetPref(NSString *key, id value) {
+    CFPreferencesSetAppValue((__bridge CFStringRef)key, (__bridge CFPropertyListRef)value,
+                             (__bridge CFStringRef)KZ_DOMAIN);
+    CFPreferencesAppSynchronize((__bridge CFStringRef)KZ_DOMAIN);
+}
+
+// 心跳：写进偏好域，设置页直接显示，用来判断 tweak 到底有没有被注入
+static void KZBeat(NSString *result) {
+    KZSetPref(@"lastSeen", @([[NSDate date] timeIntervalSince1970]));
+    if (result) KZSetPref(@"lastResult", result);
 }
 
 static void KZLog(NSString *fmt, ...) {
@@ -103,6 +115,7 @@ static void KZApply(void) {
     NSArray *dirs = found[@"dirs"];
     if (dirs.count == 0) {
         KZLog(@"apply: no .ca dirs (theme=%@ eye=%@) — 挂载可能没加", KZ_THEME_DIR, eyeName);
+        KZBeat(@"失败：找不到 .ca 目录（挂载没加？）");
         return;
     }
 
@@ -153,6 +166,8 @@ static void KZApply(void) {
     }
     KZLog(@"apply: root=%@ dirs=%lu ok=%d eye=%@ cd=%@ scale=%@ dur=%@",
           found[@"root"], (unsigned long)dirs.count, ok, eyeName, cdStyle, scaleStr, durStr);
+    KZBeat([NSString stringWithFormat:@"%@ 目录%lu 成功%d 素材%@ %@s",
+            [found[@"root"] lastPathComponent], (unsigned long)dirs.count, ok, eyeName, scaleStr]);
 }
 
 
@@ -163,6 +178,7 @@ static void KZNotifyCallback(CFNotificationCenterRef c, void *observer, CFString
 
 %ctor {
     KZLog(@"tweak loaded (v1.1.0)");
+    KZBeat(nil);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         KZApply();
     });
