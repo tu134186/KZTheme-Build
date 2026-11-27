@@ -9,4 +9,11 @@ for APP in /Applications/ReplayKitAngel.app /var/jb/mnt/Applications/ReplayKitAn
 done
 [ -d "/Library/KZTheme" ] && chown -R mobile:wheel "/Library/KZTheme" 2>/dev/null || true
 [ -d "/var/jb/Library/KZTheme" ] && chown -R mobile:wheel "/var/jb/Library/KZTheme" 2>/dev/null || true
+# 隐根（roothide）：给 rootless 的 dylib 补上补丁标记，否则加载器直接跳过
+DL=/var/jb/Library/MobileSubstrate/DynamicLibraries
+PATCH=/usr/lib/DynamicPatches/AutoPatches.dylib
+[ -e "$PATCH" ] || PATCH=/var/jb/usr/lib/DynamicPatches/AutoPatches.dylib
+if [ -d "$DL" ] && [ -e "$PATCH" ]; then
+    ln -sf "$PATCH" "$DL/KZTheme.dylib.roothidepatch" 2>/dev/null || true
+fi
 exit 0
