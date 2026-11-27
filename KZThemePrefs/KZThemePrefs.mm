@@ -156,13 +156,16 @@ static void KZScheduleApply(void) {
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    self.titleLabel.hidden = YES;
+    self.detailTextLabel.hidden = YES;
     CGRect b = self.contentView.bounds;
     CGFloat w = b.size.width;
-    self.nameLabel.frame = CGRectMake(16, 5, w - 130, 20);
-    self.valueLabel.frame = CGRectMake(w - 108, 5, 92, 20);
-    _minus.frame = CGRectMake(12, 30, 38, 32);
-    _plus.frame = CGRectMake(w - 50, 30, 38, 32);
-    self.slider.frame = CGRectMake(58, 30, w - 116, 32);
+    CGFloat h = MAX(b.size.height, 76.0);
+    self.nameLabel.frame = CGRectMake(16, 8, w - 140, 21);
+    self.valueLabel.frame = CGRectMake(w - 118, 8, 102, 21);
+    _minus.frame = CGRectMake(14, h - 40, 40, 30);
+    _plus.frame = CGRectMake(w - 54, h - 40, 40, 30);
+    self.slider.frame = CGRectMake(60, h - 40, w - 124, 30);
 }
 
 @end
@@ -189,6 +192,7 @@ static void KZScheduleApply(void) {
                 [s setProperty:@76 forKey:@"height"];
             }
         }
+        [self refreshDynamicRows:NO];
     }
     return _specifiers;
 }
@@ -210,49 +214,47 @@ static void KZScheduleApply(void) {
 
 #pragma mark 导入
 
+    NSString *shown = [eye isEqualToString:@"custom"] ? @"自定义图片" : eye;
+    return [NSString stringWithFormat:@"当前素材：%@", shown];
+}
+
 - (NSString *)countdownTitle {
     NSString *cd = KZPrefStr(@"countdown") ?: @"B";
     NSDictionary *names = @{ @"A": @"A 六边形白点", @"B": @"B 彩色数字", @"C": @"C 彩色秒表" };
     return [NSString stringWithFormat:@"样式：%@（点一下换下一套）", names[cd] ?: cd];
 }
 
-- (void)notifyRow {
-    NSString *eye = KZPrefStr(@"eye") ?: @"sharingan";
-    NSString *shown = [eye isEqualToString:@"custom"] ? @"自定义图片" : eye;
-    for (PSSpecifier *s in self.specifiers) {
-        NSString *key = [s propertyForKey:@"key"];
-        if ([key isEqualToString:@"eyeName"]) {
-            [s setProperty:[NSString stringWithFormat:@"当前素材：%@", shown] forKey:@"label"];
-            [self reloadSpecifier:s animated:NO];
-        } else if ([key isEqualToString:@"countdown"]) {
-            [s setProperty:[self countdownTitle] forKey:@"label"];
-            [self reloadSpecifier:s animated:NO];
-        }
-    }
-    [self refreshStatus];
+- (NSString *)statusText {
+    NSString *seen = KZPrefStr(@"lastSeen");
+    if (!seen) return @"插件：未运行（tweak 没被注入，或刚重启不到 3 秒）";
+    double d = [[NSDate date] timeIntervalSince1970] - [seen doubleValue];
+    NSString *ago = d < 90 ? @"刚刚" : [NSString stringWithFormat:@"%.0f 分钟前", d / 60.0];
+    return [NSString stringWithFormat:@"插件：运行中（%@）", ago];
 }
 
-- (void)refreshStatus {
-    NSString *seen = KZPrefStr(@"lastSeen");
-    NSString *status;
-    if (!seen) {
-        status = @"插件：未运行（tweak 没被注入，或还没到 3 秒）";
-    } else {
-        double d = [[NSDate date] timeIntervalSince1970] - [seen doubleValue];
-        NSString *ago = d < 90 ? @"刚刚" : [NSString stringWithFormat:@"%.0f 分钟前", d / 60.0];
-        status = [NSString stringWithFormat:@"插件：运行中（%@）", ago];
-    }
+- (void)refreshDynamicRows:(BOOL)reload {
     NSString *res = KZPrefStr(@"lastResult") ?: @"无记录";
     for (PSSpecifier *s in self.specifiers) {
         NSString *key = [s propertyForKey:@"key"];
-        if ([key isEqualToString:@"kzStatus"]) {
-            [s setProperty:status forKey:@"label"];
-            [self reloadSpecifier:s animated:NO];
+        if ([key isEqualToString:@"eyeName"]) {
+            [s setProperty:[self eyeTitle] forKey:@"label"];
+        } else if ([key isEqualToString:@"countdown"]) {
+            [s setProperty:[self countdownTitle] forKey:@"label"];
+        } else if ([key isEqualToString:@"kzStatus"]) {
+            [s setProperty:[self statusText] forKey:@"label"];
         } else if ([key isEqualToString:@"kzResult"]) {
             [s setProperty:[NSString stringWithFormat:@"上次应用：%@", res] forKey:@"label"];
-            [self reloadSpecifier:s animated:NO];
         }
     }
+    if (reload) [self.tableView reloadData];
+}
+
+- (void)notifyRow {
+    [self refreshDynamicRows:YES];
+}
+
+- (void)refreshStatus {
+    [self refreshDynamicRows:YES];
 }
 
 - (void)cycleCountdown {
@@ -388,7 +390,12 @@ didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self notifyRow];
+    [self refreshDynamicRows:NO];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self refreshDynamicRows:YES];
 }
 
 @end
