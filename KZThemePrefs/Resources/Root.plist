@@ -96,9 +96,7 @@
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>KZStepperCell</string>
-			<key>cellClass</key>
-			<string>KZStepperCell</string>
+			<string>PSSliderCell</string>
 			<key>label</key>
 			<string>大小 scale</string>
 			<key>key</key>
@@ -109,10 +107,28 @@
 			<real>0.1</real>
 			<key>max</key>
 			<real>0.6</real>
-			<key>step</key>
-			<real>0.01</real>
-			<key>height</key>
-			<integer>76</integer>
+			<key>isContinuous</key>
+			<true/>
+			<key>showValue</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.minis.kztheme</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>－ 减小 0.05</string>
+			<key>action</key>
+			<string>scaleDown</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>＋ 增大 0.05</string>
+			<key>action</key>
+			<string>scaleUp</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -132,9 +148,7 @@
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>KZStepperCell</string>
-			<key>cellClass</key>
-			<string>KZStepperCell</string>
+			<string>PSSliderCell</string>
 			<key>label</key>
 			<string>转速 duration</string>
 			<key>key</key>
@@ -145,10 +159,28 @@
 			<real>0.2</real>
 			<key>max</key>
 			<real>5.0</real>
-			<key>step</key>
-			<real>0.1</real>
-			<key>height</key>
-			<integer>76</integer>
+			<key>isContinuous</key>
+			<true/>
+			<key>showValue</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.minis.kztheme</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>－ 减小 0.10</string>
+			<key>action</key>
+			<string>durDown</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>＋ 增大 0.10</string>
+			<key>action</key>
+			<string>durUp</string>
 		</dict>
 		<dict>
 			<key>cell</key>
