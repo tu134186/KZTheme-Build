@@ -212,8 +212,10 @@ static void KZScheduleApply(void) {
     return v;
 }
 
-#pragma mark 导入
+#pragma mark 动态文字
 
+- (NSString *)eyeTitle {
+    NSString *eye = KZPrefStr(@"eye") ?: @"sharingan";
     NSString *shown = [eye isEqualToString:@"custom"] ? @"自定义图片" : eye;
     return [NSString stringWithFormat:@"当前素材：%@", shown];
 }
