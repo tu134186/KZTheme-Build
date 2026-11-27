@@ -65,20 +65,20 @@ static void KZApplySoon(void) {
         if ([key isEqualToString:@"eyeName"]) {
             NSString *eye = KZPrefStr(@"eye") ?: @"sharingan";
             NSString *shown = [eye isEqualToString:@"custom"] ? @"自定义图片" : eye;
-            [s setProperty:[NSString stringWithFormat:@"当前素材：%@", shown] forKey:@"label"];
+            [s setName:[NSString stringWithFormat:@"当前素材：%@", shown]];
         } else if ([key isEqualToString:@"countdown"]) {
             NSDictionary *names = @{ @"A": @"A 六边形白点", @"B": @"B 彩色数字", @"C": @"C 彩色秒表" };
             NSString *cd = KZPrefStr(@"countdown") ?: @"B";
-            [s setProperty:[NSString stringWithFormat:@"样式：%@", names[cd] ?: cd] forKey:@"label"];
+            [s setName:[NSString stringWithFormat:@"样式：%@", names[cd] ?: cd]];
         } else if ([key isEqualToString:@"kzStatus"]) {
-            [s setProperty:[self statusText] forKey:@"label"];
+            [s setName:[self statusText]];
         } else if ([key isEqualToString:@"kzResult"]) {
             NSString *res = KZPrefStr(@"lastResult") ?: @"无记录";
-            [s setProperty:[NSString stringWithFormat:@"上次应用：%@", res] forKey:@"label"];
+            [s setName:[NSString stringWithFormat:@"上次应用：%@", res]];
         } else if ([key isEqualToString:@"scale"]) {
-            [s setProperty:[NSString stringWithFormat:@"大小 %.2f", [self numPref:@"scale" dflt:0.6]] forKey:@"label"];
+            [s setName:[NSString stringWithFormat:@"大小 %.2f", [self numPref:@"scale" dflt:0.6]]];
         } else if ([key isEqualToString:@"duration"]) {
-            [s setProperty:[NSString stringWithFormat:@"转速 %.2f 秒", [self numPref:@"duration" dflt:1.5]] forKey:@"label"];
+            [s setName:[NSString stringWithFormat:@"转速 %.2f 秒", [self numPref:@"duration" dflt:1.5]]];
         }
     }
 }
