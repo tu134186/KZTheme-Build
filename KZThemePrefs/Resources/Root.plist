@@ -30,11 +30,19 @@
 		</dict>
 		<dict>
 			<key>cell</key>
+			<string>PSStaticTextCell</string>
+			<key>key</key>
+			<string>kzValues</string>
+			<key>label</key>
+			<string>当前：—</string>
+		</dict>
+		<dict>
+			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>素材图片</string>
 			<key>footerText</key>
-			<string>导入的图片会裁成正方形、缩到 320×320，存进设置里，不用往挂载目录拷文件。</string>
+			<string>导入的图片会裁成正方形、缩到 320×320，存在设置里，不用往挂载目录拷文件。</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -74,7 +82,7 @@
 			<key>label</key>
 			<string>倒数 3-2-1 样式</string>
 			<key>footerText</key>
-			<string>点一次换下一套：A 六边形白点 / B 彩色数字 / C 彩色秒表。</string>
+			<string>录屏开始前系统倒数 3 秒时显示的图案。</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -82,9 +90,9 @@
 			<key>key</key>
 			<string>countdown</string>
 			<key>label</key>
-			<string>样式：B 彩色数字</string>
+			<string>选择样式…</string>
 			<key>action</key>
-			<string>cycleCountdown</string>
+			<string>pickCountdown</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -96,9 +104,13 @@
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSSliderCell</string>
-			<key>label</key>
+			<string>KZStepperCell</string>
+			<key>cellClass</key>
+			<string>KZStepperCell</string>
+			<key>kzTitle</key>
 			<string>大小 scale</string>
+			<key>label</key>
+			<string></string>
 			<key>key</key>
 			<string>scale</string>
 			<key>default</key>
@@ -107,36 +119,10 @@
 			<real>0.1</real>
 			<key>max</key>
 			<real>0.6</real>
-			<key>isContinuous</key>
-			<true/>
-			<key>showValue</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.minis.kztheme</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>label</key>
-			<string>－ 减小 0.05</string>
-			<key>action</key>
-			<string>scaleDown</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>label</key>
-			<string>＋ 增大 0.05</string>
-			<key>action</key>
-			<string>scaleUp</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>label</key>
-			<string>直接输入大小…</string>
-			<key>action</key>
-			<string>editScale</string>
+			<key>step</key>
+			<real>0.01</real>
+			<key>height</key>
+			<integer>62</integer>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -144,13 +130,17 @@
 			<key>label</key>
 			<string>转速</string>
 			<key>footerText</key>
-			<string>秒数，越大转得越慢（1.50 = 1.5 秒转一圈）。</string>
+			<string>秒数，越大转得越慢（1.50 = 1.5 秒转一圈）。按住滑块拖，或点左右两边的 － ＋ 微调。</string>
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSSliderCell</string>
-			<key>label</key>
+			<string>KZStepperCell</string>
+			<key>cellClass</key>
+			<string>KZStepperCell</string>
+			<key>kzTitle</key>
 			<string>转速 duration</string>
+			<key>label</key>
+			<string></string>
 			<key>key</key>
 			<string>duration</string>
 			<key>default</key>
@@ -159,36 +149,10 @@
 			<real>0.2</real>
 			<key>max</key>
 			<real>5.0</real>
-			<key>isContinuous</key>
-			<true/>
-			<key>showValue</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.minis.kztheme</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>label</key>
-			<string>－ 减小 0.10</string>
-			<key>action</key>
-			<string>durDown</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>label</key>
-			<string>＋ 增大 0.10</string>
-			<key>action</key>
-			<string>durUp</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>label</key>
-			<string>直接输入秒数…</string>
-			<key>action</key>
-			<string>editDuration</string>
+			<key>step</key>
+			<real>0.1</real>
+			<key>height</key>
+			<integer>62</integer>
 		</dict>
 		<dict>
 			<key>cell</key>
