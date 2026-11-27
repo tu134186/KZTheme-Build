@@ -100,7 +100,7 @@
 			<key>label</key>
 			<string>大小</string>
 			<key>footerText</key>
-			<string>0.60 已经是系统槽位上限，再大就会被裁掉。</string>
+			<string>左边是录屏时贴边的那个；右边是独立出来的那团圆。数字调到 1.00 基本就是槽位上限，再大会被裁掉。</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -108,7 +108,7 @@
 			<key>cellClass</key>
 			<string>KZStepperCell</string>
 			<key>kzTitle</key>
-			<string>大小 scale</string>
+			<string>左（贴边）</string>
 			<key>label</key>
 			<string></string>
 			<key>key</key>
@@ -118,7 +118,29 @@
 			<key>min</key>
 			<real>0.1</real>
 			<key>max</key>
-			<real>0.6</real>
+			<real>1.3</real>
+			<key>step</key>
+			<real>0.01</real>
+			<key>height</key>
+			<integer>62</integer>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>KZStepperCell</string>
+			<key>cellClass</key>
+			<string>KZStepperCell</string>
+			<key>kzTitle</key>
+			<string>右（独立圆）</string>
+			<key>label</key>
+			<string></string>
+			<key>key</key>
+			<string>scaleR</string>
+			<key>default</key>
+			<string>0.95</string>
+			<key>min</key>
+			<real>0.1</real>
+			<key>max</key>
+			<real>1.3</real>
 			<key>step</key>
 			<real>0.01</real>
 			<key>height</key>
