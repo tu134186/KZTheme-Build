@@ -10,6 +10,28 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
+			<string>状态</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSStaticTextCell</string>
+			<key>key</key>
+			<string>kzStatus</string>
+			<key>label</key>
+			<string>插件：检查中…</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSStaticTextCell</string>
+			<key>key</key>
+			<string>kzResult</string>
+			<key>label</key>
+			<string>上次应用：无记录</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
 			<string>素材图片</string>
 			<key>footerText</key>
 			<string>导入的图片会裁成正方形、缩到 320×320，存进设置里，不用往挂载目录拷文件。</string>
@@ -52,33 +74,17 @@
 			<key>label</key>
 			<string>倒数 3-2-1 样式</string>
 			<key>footerText</key>
-			<string>录屏开始前系统倒数 3 秒时显示的图案。</string>
+			<string>点一次换下一套：A 六边形白点 / B 彩色数字 / C 彩色秒表。</string>
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSLinkListCell</string>
-			<key>label</key>
-			<string>样式</string>
+			<string>PSButtonCell</string>
 			<key>key</key>
 			<string>countdown</string>
-			<key>default</key>
-			<string>B</string>
-			<key>detail</key>
-			<string>PSListItemsController</string>
-			<key>defaults</key>
-			<string>com.minis.kztheme</string>
-			<key>validValues</key>
-			<array>
-				<string>A</string>
-				<string>B</string>
-				<string>C</string>
-			</array>
-			<key>titles</key>
-			<array>
-				<string>A 标准（六边形白点）</string>
-				<string>B 彩色数字（推荐）</string>
-				<string>C 彩色秒表</string>
-			</array>
+			<key>label</key>
+			<string>样式：B 彩色数字</string>
+			<key>action</key>
+			<string>cycleCountdown</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -90,6 +96,8 @@
 		</dict>
 		<dict>
 			<key>cell</key>
+			<string>KZStepperCell</string>
+			<key>cellClass</key>
 			<string>KZStepperCell</string>
 			<key>label</key>
 			<string>大小 scale</string>
@@ -104,7 +112,15 @@
 			<key>step</key>
 			<real>0.01</real>
 			<key>height</key>
-			<real>70</real>
+			<integer>76</integer>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>直接输入大小…</string>
+			<key>action</key>
+			<string>editScale</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -116,6 +132,8 @@
 		</dict>
 		<dict>
 			<key>cell</key>
+			<string>KZStepperCell</string>
+			<key>cellClass</key>
 			<string>KZStepperCell</string>
 			<key>label</key>
 			<string>转速 duration</string>
@@ -130,7 +148,15 @@
 			<key>step</key>
 			<real>0.1</real>
 			<key>height</key>
-			<real>70</real>
+			<integer>76</integer>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>直接输入秒数…</string>
+			<key>action</key>
+			<string>editDuration</string>
 		</dict>
 		<dict>
 			<key>cell</key>
