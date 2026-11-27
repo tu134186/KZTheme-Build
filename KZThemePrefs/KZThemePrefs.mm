@@ -260,7 +260,8 @@ static void KZApplySoon(void) {
         } else if ([key isEqualToString:@"kzResult"]) {
             NSString *res = KZPrefStr(@"lastResult") ?: @"无记录";
             [s setName:[NSString stringWithFormat:@"上次应用：%@", res]];
-        } else if ([key isEqualToString:@"scale"] || [key isEqualToString:@"duration"]) {
+        } else if ([key isEqualToString:@"scale"] || [key isEqualToString:@"duration"] ||
+                   [key isEqualToString:@"scaleR"]) {
             Class stepper = NSClassFromString(@"KZStepperCell");
             if (stepper) {
                 [s setProperty:stepper forKey:@"cellClass"];
@@ -268,9 +269,9 @@ static void KZApplySoon(void) {
             }
             [s setProperty:@62 forKey:@"height"];
         } else if ([key isEqualToString:@"kzValues"]) {
-            [s setName:[NSString stringWithFormat:@"当前：大小 %.2f ｜ 转速 %.2f 秒 ｜ 样式 %@",
-                        [self numPref:@"scale" dflt:0.6], [self numPref:@"duration" dflt:1.5],
-                        [self cdName]]];
+            [s setName:[NSString stringWithFormat:@"当前：左 %.2f ｜ 右 %.2f ｜ 转速 %.2f 秒 ｜ %@",
+                        [self numPref:@"scale" dflt:0.6], [self numPref:@"scaleR" dflt:0.95],
+                        [self numPref:@"duration" dflt:1.5], [self cdName]]];
         }
     }
 }
