@@ -50,11 +50,10 @@ static void KZLog(NSString *fmt, ...) {
 
 // 录屏指示器所在的 app 可能出现在这几个位置（有无根 / bindfs 挂载 / 直连）
 static NSArray<NSString *> *KZAppRoots(void) {
-    return @[ @"/Applications/ReplayKitAngel.app",
-              @"/var/jb/mnt/Applications/ReplayKitAngel.app",
+    // 只写 Dopamine 挂载出来的那份副本；系统原路径 /Applications 一律不碰
+    return @[ @"/var/jb/mnt/Applications/ReplayKitAngel.app",
               @"/mnt/Applications/ReplayKitAngel.app",
-              @"/var/jb/Applications/ReplayKitAngel.app",
-              @"/rootfs/Applications/ReplayKitAngel.app" ];
+              @"/var/jb/Applications/ReplayKitAngel.app" ];
 }
 
 // 返回 @{@"root": 实际用的 app 路径, @"dirs": .ca 目录数组}
@@ -170,6 +169,19 @@ static void KZApply(void) {
             [found[@"root"] lastPathComponent], (unsigned long)dirs.count, ok, eyeName, scaleStr]);
 }
 
+
+// 一个真正的 hook：让这个 dylib 和别的插件一样带上 CydiaSubstrate 依赖，
+// 同时 SpringBoard 启动完成时立刻应用一次
+%hook SpringBoard
+
+- (BOOL)application:(id)application didFinishLaunchingWithOptions:(id)options {
+    BOOL r = %orig;
+    KZLog(@"springboard didFinishLaunching hook");
+    dispatch_async(dispatch_get_main_queue(), ^{ KZApply(); });
+    return r;
+}
+
+%end
 
 static void KZNotifyCallback(CFNotificationCenterRef c, void *observer, CFStringRef name,
                              const void *object, CFDictionaryRef info) {
